@@ -1,67 +1,79 @@
-```vue
 <template>
-    <div v-if="isOpen" class="container mt-4">
-        <form @submit.prevent="submitForm">
+<div class="modal fade show" style="display: block;" tabindex="-1" @click.self="emit('close')">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Додати користувача</h5>
+          <button type="button" class="btn-close" @click="emit('close')"></button>
+        </div>
+        <div class="modal-body">
+          <form @submit.prevent="submitForm">
             <div class="mb-3">
-                <label for="firstName" class="form-label">Firts Name</label>
-                <input v-model="firstName" type="text" class="form-control" id="firstName" placeholder="Firts Name" required>
+              <label for="firstName" class="form-label">Ім'я</label>
+              <input
+                v-model="form.firstName"
+                type="text"
+                class="form-control"
+                id="firstName"
+                required
+              />
             </div>
             <div class="mb-3">
-                <label for="lastName" class="form-label">Last Name</label>
-                <input v-model="lastName" type="text" class="form-control" id="lastName" placeholder="Last Name" required>
+              <label for="lastName" class="form-label">Прізвище</label>
+              <input
+                v-model="form.lastName"
+                type="text"
+                class="form-control"
+                id="lastName"
+                required
+              />
             </div>
             <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input v-model="email" type="email" class="form-control" id="email" placeholder="Email" required>
+              <label for="email" class="form-label">Емейл</label>
+              <input
+                v-model="form.email"
+                type="email"
+                class="form-control"
+                id="email"
+                required
+              />
             </div>
             <div class="mb-3">
-                <label for="avatar" class="form-label">Avatar's Url</label>
-                <input v-model="avatar" type="url" class="form-control" id="avatar" placeholder="Avatar's Url" required>
+              <label for="photo" class="form-label">Фото (URL)</label>
+              <input
+                v-model="form.photo"
+                type="url"
+                class="form-control"
+                id="photo"
+                placeholder="https://example.com/photo.jpg"
+              />
             </div>
-            <button type="submit" class="btn btn-primary">Add users</button>
-            <button type="button" class="btn btn-secondary" @click="$emit('close')">Close</button>
-        </form>
+            <button type="submit" class="btn btn-primary">Додати</button>
+          </form>
+        </div>
+      </div>
     </div>
+  </div>
+  <div class="modal-backdrop fade show" @click="emit('close')"></div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref } from 'vue';
 
-const emit = defineEmits(['add-user'])
+// Реактивна форма
+const form = ref({
+  firstName: '',
+  lastName: '',
+  email: '',
+  photo: '',
+});
 
-const firstName = ref('')
-const lastName = ref('')
-const email = ref('')
-const avatar = ref('')
+// Визначаємо події
+const emit = defineEmits(['close', 'submit']);
 
-const handleSubmit = () => {
-    // Валідація email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(email.value)) {
-        alert('Введіть правильний email')
-        return
-    }
-
-    // Валідація URL аватара
-    const urlRegex = /^(https?:\/\/.*\.(?:png|jpg|jpeg|gif|svg))$/i
-    if (!urlRegex.test(avatar.value)) {
-        alert('Введіть правильний URL зображення (png, jpg, jpeg, gif, svg)')
-        return
-    }
-
-    const newUser = {
-        userId: Date.now(),
-        first_name: firstName.value,
-        last_name: lastName.value,
-        email: email.value,
-        avatar: avatar.value
-    }
-    emit('add-user', newUser)
-
-    // Очистити форму
-    firstName.value = ''
-    lastName.value = ''
-    email.value = ''
-    avatar.value = ''
+// Обробка відправлення форми
+const submitForm = () => {
+  emit('submit', { ...form.value });
+  form.value = { firstName: '', lastName: '', email: '', photo: '' };
 }
 </script>
